@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, CalendarClock, ClipboardList, Clock3, PackageCheck, Wallet, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { ArrowUpRight, BarChart3, CalendarClock, ClipboardList, Clock3, PackageCheck, Plus, Sparkles, TrendingUp, UserPlus, Wallet, ChevronRight } from 'lucide-react';
 import { useShop } from './store.jsx';
 import { dateKey, fmtDate, metrics, money, nextDueDate, orderBalance, overallStatus, receivedByDate, remainingPieces, shiftDay } from './model.js';
 import { CardHead, Initials, PageHead, StatusPill, TextLink, Empty } from './ui.jsx';
@@ -14,13 +14,29 @@ function DueRow({order,onOpen,today}) {
     <span className={'due-date '+(due<today?'late':'')}><CalendarClock size={14}/>{when}</span><span className="due-status"><StatusPill status={overallStatus(order)}/></span><ChevronRight className="row-arrow" size={17}/>
   </button>;
 }
-export default function Dashboard({onOrder,onView,onNew}) {
+export default function Dashboard({onOrder,onView,onNew,onCustomer}) {
   const {data}=useShop(); const today=dateKey(); const m=metrics(data,today);
   const queue=[...m.open].sort((a,b)=>(nextDueDate(a)||'9999').localeCompare(nextDueDate(b)||'9999')).slice(0,5);
   const capacity=Math.max(1,Number(data.shop.capacity)||1), pct=Math.min(100,Math.round(m.dueTodayPieces/capacity*100));
   const days=Array.from({length:7},(_,i)=>shiftDay(today,i-6)); const values=days.map(d=>receivedByDate(data,d)); const max=Math.max(...values,1); const weekly=values.reduce((s,n)=>s+n,0);
   return <div className="page dashboard-page">
     <PageHead eyebrow="DUKAAN OVERVIEW" title={<>Aaj ka kaam, <em>aasan.</em></>} subtitle="Aapki dukaan ka saara haal, ek nazar mein." actions={<div className="today-chip"><CalendarClock size={15}/> {fmtDate(today,{weekday:'short',day:'numeric',month:'long'})}</div>}/>
+    <div className="hero-banner">
+      <img src="/img/hero-dashboard.jpg" alt="Dukaan mein rakha kapra, dhaaga aur naap ka saman" width="1440" height="576" fetchPriority="high"/>
+      <div className="hero-scrim"/>
+      <div className="hero-copy">
+        <span className="hero-eyebrow">AM DRESS POINT · CLOTH HOUSE</span>
+        <strong>Har naap, <em>perfect fitting.</em></strong>
+        <small>{m.open.length} order khulay · {m.dueTodayPieces} joray aaj due</small>
+      </div>
+      <span className="hero-tag">Aaj ka kaam</span>
+    </div>
+    <div className="quick-row">
+      <button className="quick-tile" onClick={onNew}><span className="q-icon q-order"><Plus size={18}/></span>Naya order</button>
+      <button className="quick-tile" onClick={onCustomer}><span className="q-icon q-customer"><UserPlus size={18}/></span>Customer</button>
+      <button className="quick-tile" onClick={()=>onView('finance')}><span className="q-icon q-hisaab"><Wallet size={18}/></span>Hisaab</button>
+      <button className="quick-tile" onClick={()=>onView('reports')}><span className="q-icon q-reports"><BarChart3 size={18}/></span>Reports</button>
+    </div>
     <div className="stats-grid">
       <StatCard icon={ClipboardList} label="Kaam jaari" value={`${m.openPieces} joray`} detail={`${m.open.length} open orders`} tone="sage"/>
       <StatCard icon={CalendarClock} label="Aaj ki delivery" value={`${m.dueTodayPieces} joray`} detail={`${m.dueToday.length} orders aaj due`} tone="sand"/>

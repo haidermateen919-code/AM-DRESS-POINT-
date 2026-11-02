@@ -50,7 +50,7 @@ export const amount = value => {
 };
 export function blankData() {
   return { schema: 1, localRevision: 0, nextOrderSerial: 1001, isDemo: false,
-    shop: { name: 'Meri Darzi Dukaan', owner: '', phone: '', address: '', capacity: 8 },
+    shop: { name: 'AM Dress Point', owner: '', phone: '', address: '', capacity: 8 },
     customers: [], workers: [], orders: [], expenses: [] };
 }
 export function orderTotal(order) {
@@ -103,7 +103,7 @@ export function addMeasurement(data, customerId, personId, measure) {
 }
 export function nextOrderNumber(data) {
   const maximum = (data.orders || []).reduce((n, o) => Math.max(n, Number(String(o.number || '').replace(/\D/g,'')) || 0), 1000);
-  return `DD-${Math.max(maximum+1, Number(data.nextOrderSerial)||1001)}`;
+  return `AD-${Math.max(maximum+1, Number(data.nextOrderSerial)||1001)}`;
 }
 export function workerTotals(data, workerId) {
   let agreed = 0, completed = 0;

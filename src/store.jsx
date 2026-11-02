@@ -137,6 +137,6 @@ export function ShopProvider({children}) {
   const disconnectSync=async()=>{await setConfig(null);setSyncStatus('local');};
   const startFresh=()=>replaceLocal(blankData());
   if(bootError) return <div className="fatal"><strong>Storage nahi khul saki</strong><p>{bootError}</p><p>Browser settings mein site storage allow karke dobara kholain.</p></div>;
-  if(!data) return <div className="app-loading"><span className="spinner"/>Dukaan khul rahi hai…</div>;
+  if(!data) return <div className="app-loading"><img className="loading-logo" src="/logo-full.png" width="320" height="148" alt="AM Dress Point"/><span className="spinner"/>Dukaan khul rahi hai…</div>;
   return <Ctx.Provider value={{data,mutate,replaceLocal,startFresh,sync,syncStatus,online,storageError,performSync,createSync,connectSync,useRemote,disconnectSync}}>{children}</Ctx.Provider>;
 }

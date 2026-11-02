@@ -1,0 +1,9 @@
+node_modules/
+site/
+data/
+*.zip
+.DS_Store
+__pycache__/
+*.pyc
+image-search/
+AM-Dress-Point-Guide.pdf
