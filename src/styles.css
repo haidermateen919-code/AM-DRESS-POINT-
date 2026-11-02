@@ -2177,7 +2177,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--green); }
 
 .guide-top {
   position: sticky;
-  top: -20px;
+  top: 0;
   z-index: 4;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
