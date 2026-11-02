@@ -16,10 +16,10 @@ AM Dress Point (Cloth House) — mardon ki silai ki dukaan ke liye mobile-friend
 
 ## Guide (app ke andar)
 
-**Settings → Guide kholein** se mukammal guide khulti hai: 12 hisse, har feature ka aasan roman-urdu tareeqa, chhoti SVG tasveeron ke sath (dashboard, order, status flow, naap, hisaab, reports, backup, sync, mobile, FAQ).
+**Settings → Guide kholein** se mukammal guide khulti hai: 12 hisse, har feature ka aasan roman-urdu tareeqa. Har hisse ke sath **app ki asli screen** dikhti hai — wohi components, wohi rang, wohi buttons (dashboard, order form, status pills, naap ka live figure, hisaab, reports ka chart, backup, sync, mobile nav, FAQ). Koi nakshi tasveer nahi; jo screen guide mein hai wohi app mein bhi hai.
 
 - **PDF download** — poori guide (8 safhe, A4) app hi mein banti hai; koi internet ya library nahi chahiye. File ka naam: `am-dress-point-guide-YYYY-MM-DD.pdf`.
-- PDF engine `src/pdf.js` (standard PDF commands, Helvetica) aur content `src/guide.js` mein hai — app aur PDF dono ek hi content se bante hain, is liye dono kabhi alag nahi hote.
+- PDF engine `src/pdf.js` (standard PDF commands, Helvetica) — har hisse ke liye app jaisa screen, asli labels aur rang ke sath. Content `src/guide.js` mein hai — app aur PDF dono ek hi content se bante hain, is liye dono kabhi alag nahi hote.
 - Naya feature add karein to `src/guide.js` mein us ka hissa likh dein; guide aur PDF khud update ho jayenge.
 
 ## Mobile aur offline

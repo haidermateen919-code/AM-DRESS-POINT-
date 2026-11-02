@@ -67,7 +67,7 @@ export function buildGuidePdf(sections, meta = {}) {
 
   const ops = (...parts) => page.ops.push(...parts);
   const color = (name, stroke = false) => {
-    const [r, g, b] = COLORS[name] || [0, 0, 0];
+    const [r, g, b] = Array.isArray(name) ? name : (COLORS[name] || [0, 0, 0]);
     return stroke ? `${r} ${g} ${b} RG` : `${r} ${g} ${b} rg`;
   };
   const rect = (x, top, w, h, fill, radius = 0) => {
@@ -165,86 +165,321 @@ export function buildGuidePdf(sections, meta = {}) {
   text(`${sections.length} hisse  -  ${meta.shopName ? shopNameLine(meta.shopName) : 'AM Dress Point'}`, M, M + 6, 9, { color: 'faint' });
 
   /* ------------------------------------------------------------- sections */
-  const drawDiagram = (kind, x, top, w, h) => {
+  /* Chhote "screens" — app ki asli screens jaisa vector naksha, asli labels ke sath. */
+  const PILL = {
+    naya: ['#f2f4f7', [0.28, 0.33, 0.41]],
+    cutting: ['#fff7e6', [0.7, 0.37, 0.04]],
+    silai: ['#fff3e9', [0.71, 0.28, 0.03]],
+    fitting: ['#eef0ff', [0.21, 0.22, 0.8]],
+    tayyar: ['#ecfdf3', [0.02, 0.46, 0.28]],
+    diya: ['#e9f5f7', [0.05, 0.43, 0.51]],
+  };
+  const hexRgb = (hex) => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const pill = (x, yTop, label, tone = 'naya', size = 6.8) => {
+    const [bg, fg] = PILL[tone] || PILL.naya;
+    const w = textWidth(label, size, true) + 12;
+    rect(x, yTop, w, 12, hexRgb(bg), 6);
+    circle(x + 6, yTop - 6, 1.5, fg);
+    text(label, x + 9.5, yTop - 8.2, size, { bold: true, color: fg });
+    return w;
+  };
+  const bar = (x, yTop, w, h, fill) => rect(x, yTop, w, h, fill, h / 2);
+
+  const SCREENS = {
+    shuruat: {
+      title: 'AM Dress Point  ·  Dashboard',
+      tiles: ['Naya order', 'Customer', 'Hisaab', 'Reports'],
+      rows: [
+        { t: 'Ahmed Khan', s: 'AD-1042 · 2 joray', pill: ['Silai', 'silai'] },
+        { t: 'Bilal Aslam', s: 'AD-1038 · 1 jora', pill: ['Tayyar', 'tayyar'] },
+      ],
+      button: null,
+    },
+    dashboard: {
+      title: 'Aaj ka kaam  ·  3 joray due',
+      stats: [['Kaam jaari', '14 joray'], ['Aaj ki delivery', '3 joray']],
+      rows: [
+        { t: 'Ahmed Khan', s: 'AD-1042 · aaj', pill: ['Tayyar', 'tayyar'] },
+        { t: 'Bilal Aslam', s: 'AD-1038 · late', pill: ['Cutting', 'cutting'] },
+      ],
+    },
+    order: {
+      title: 'Naya order  ·  AD-1043',
+      fields: [['Customer', 'Ahmed Khan'], ['Kapray', 'Shalwar Kameez'], ['Joray / rate', '2  ·  3,200'], ['Delivery', '18 Nov 2026']],
+      button: 'Order save karein',
+    },
+    naap: {
+      title: 'Naap  ·  Shalwar Kameez',
+      fields: [['Lambai', '42"'], ['Chaati', '24"'], ['Bazu', '23"'], ['Daman', '26"']],
+      garment: true,
+      pillTop: ['Live preview', 'tayyar'],
+    },
+    karigar: {
+      title: 'Karigar  ·  mazdoori',
+      rows: [
+        { t: 'Akram', s: '6 joray', bar: 0.68, right: 'Rs. 4,800' },
+        { t: 'Master Saleem', s: '4 joray', bar: 0.46, right: 'Rs. 3,200' },
+        { t: 'Rashid', s: '3 joray', bar: 0.32, right: 'Rs. 2,100' },
+      ],
+    },
+    hisaab: {
+      title: 'Hisaab  ·  aaj',
+      rows: [
+        { t: 'Ahmed Khan', s: 'AD-1042 · payment', right: '+2,500', tone: 'in' },
+        { t: 'Dhaaga aur button', s: 'Kharcha', right: '-1,200', tone: 'out' },
+        { t: 'Bilal Aslam', s: 'AD-1038 · payment', right: '+4,000', tone: 'in' },
+      ],
+      total: [['AAJ KI WASOOLI', 'Rs. 6,500'], ['BAQAYA', 'Rs. 12,300']],
+    },
+    reports: {
+      title: 'Reports  ·  pichlay 7 din',
+      chart: [38, 62, 46, 78, 54, 88, 70],
+      caption: 'Total wasooli  Rs. 94,500',
+    },
+    backup: {
+      title: 'Settings  ·  backup',
+      note: 'Is device ka data browser storage mein hai.',
+      rows: [
+        { t: 'Aakhri backup', s: 'Aaj, 9:40 baje', pill: ['Safe', 'tayyar'] },
+        { t: 'Backup file', s: 'backup-2026-11-02.json', right: '24 KB' },
+      ],
+      button: 'Backup download karein',
+      second: 'Backup restore karein',
+    },
+    sync: {
+      title: 'Sync  ·  doosray device se',
+      rows: [
+        { t: 'Is device', s: 'Ahmed ka phone', pill: ['Synced', 'tayyar'] },
+        { t: 'Doosra device', s: 'Ghar ka tablet', pill: ['Synced', 'tayyar'] },
+      ],
+      key: 'DD1.7fK2pQ9xR4tV8mN3bL6sW1yZ5aC',
+      button: 'Key copy karein',
+    },
+    mobile: {
+      title: 'Phone  ·  Home',
+      rows: [
+        { t: 'Ahmed Khan', s: 'AD-1042 · aaj', pill: ['Silai', 'silai'] },
+      ],
+      nav: ['Home', 'Orders', 'Naap', 'Hisaab', 'More'],
+      fab: 'Naya order',
+    },
+    faq: {
+      title: 'Aam sawal',
+      qa: [
+        ['Data kahan rehta hai?', 'Aap ke phone ke browser ke andar.'],
+        ['Phone badalna ho to?', 'Backup download karein, naye phone par restore karein.'],
+      ],
+    },
+  };
+
+  const drawScreen = (section, x, top, w, h) => {
+    const spec = SCREENS[section.id] || SCREENS.shuruat;
     rect(x, top, w, h, 'bg', 10);
-    const px = x + 14;
-    const pt = top - 16;
-    const iw = w - 28;
+    const px = x + 12;
+    const pw = w - 24;
+    let pt = top - 12;
 
-    if (kind === 'flow') {
-      const labels = ['Naya', 'Cutting', 'Silai', 'Fitting', 'Tayyar', 'Diya'];
-      const gap = 7;
-      const cw = (iw - gap * 5) / 6;
-      labels.forEach((l, i) => {
-        const cx0 = px + i * (cw + gap);
-        const active = i === 4;
-        rect(cx0, pt, cw, 22, active ? 'greenSoft' : 'white', 11);
-        strokeRect(cx0, pt, cw, 22, active ? 'greenLine' : 'line', 11);
-        text(l, cx0 + 7, pt - 14, 8.2, { bold: true, color: active ? 'green' : 'body' });
+    /* phone/desktop header */
+    rect(px, pt, pw, 22, 'navy', 5);
+    rect(px + 6, pt - 15, 11, 8, [0.16, 0.26, 0.44], 2);
+    text(spec.title, px + 22, pt - 14.5, 8, { bold: true, color: 'white' });
+    if (spec.pillTop && !spec.garment) pill(px + pw - 66, pt - 4, spec.pillTop[0], spec.pillTop[1], 6.2);
+    pt -= 30;
+
+    if (spec.chart) {
+      const baseY = top - h + 28;
+      const bw = (pw - 6 * 6) / 7;
+      spec.chart.forEach((v, i) => {
+        const vh = v * 0.62;
+        rect(px + i * (bw + 6), baseY + vh, bw, vh, i === 5 ? 'green' : [0.87, 0.91, 0.89], 2.5);
       });
-      wrap('Status badalne se dashboard, reports aur late ka nishan khud update hote hain.', 8.4, iw)
-        .forEach((l, i) => text(l, px, top - h + 26 + i * 11, 8.4, { color: 'body' }));
+      text(spec.caption, px, top - h + 16, 7.4, { color: 'body' });
       return;
     }
 
-    if (kind === 'bars') {
-      const values = [26, 40, 30, 52, 36, 58, 46];
-      const baseY = top - h + 26;
-      const bw = (iw - 6 * 9) / 7;
-      values.forEach((v, i) => {
-        const vh = v * 0.92;
-        rect(px + i * (bw + 9), baseY + vh, bw, vh, i === 5 ? 'green' : [0.87, 0.91, 0.89], 3);
-        text(['S', 'M', 'T', 'W', 'T', 'F', 'S'][i], px + i * (bw + 9) + bw / 2 - 2.3, baseY - 7, 7.2, { color: 'faint' });
-      });
-      line(px, baseY + 0.5, px + iw, baseY + 0.5, 'line', 0.8);
-      return;
-    }
-
-    if (kind === 'cards') {
-      const gap = 9;
-      const cw = (iw - gap * 2) / 3;
-      [0, 1, 2].forEach((i) => {
-        const cx0 = px + i * (cw + gap);
-        const ch = h - 30;
-        rect(cx0, pt, cw, ch, 'white', 8);
-        strokeRect(cx0, pt, cw, ch, 'line', 8);
-        circle(cx0 + 17, pt - 16, 8, i === 0 ? 'greenSoft' : 'bg');
-        rect(cx0 + 30, pt - 14, cw - 42, 4.2, i === 0 ? 'greenLine' : 'line', 2);
-        rect(cx0 + 10, pt - 31, cw - 20, 4.2, 'line', 2);
-        rect(cx0 + 10, pt - 41, cw - 34, 4.2, 'line', 2);
+    if (spec.qa) {
+      spec.qa.forEach(([q, a], i) => {
+        const y0 = pt - i * 34;
+        rect(px, y0, pw * 0.72, 13, 'white', 6);
+        strokeRect(px, y0, pw * 0.72, 13, 'line', 6);
+        text(q, px + 7, y0 - 9, 7.2, { bold: true, color: 'ink' });
+        rect(px + pw * 0.18, y0 - 20, pw * 0.82, 13, 'greenSoft', 6);
+        text(a, px + pw * 0.18 + 7, y0 - 29, 6.8, { color: [0.08, 0.4, 0.29] });
       });
       return;
     }
 
-    /* screen wireframe */
-    rect(px, pt, iw, 26, 'navy', 6);
-    rect(px + 9, pt - 11, iw * 0.32, 4.4, [0.42, 0.53, 0.7], 2);
-    rect(px + 9, pt - 20, iw * 0.5, 6, 'white', 3);
-    const tw = (iw - 3 * 7) / 4;
-    [0, 1, 2, 3].forEach((i) => {
-      const cx0 = px + i * (tw + 7);
-      rect(cx0, pt - 34, tw, 20, 'white', 6);
-      strokeRect(cx0, pt - 34, tw, 20, 'line', 6);
-      circle(cx0 + 9, pt - 44, 4, i === 0 ? 'greenSoft' : 'bg');
-      rect(cx0 + 17, pt - 46, tw - 24, 3.4, 'line', 1.7);
+    if (spec.tiles) {
+      const tw = (pw - 3 * 6) / 4;
+      spec.tiles.forEach((t, i) => {
+        rect(px + i * (tw + 6), pt - 2, tw, 26, 'white', 5);
+        strokeRect(px + i * (tw + 6), pt - 2, tw, 26, 'line', 5);
+        circle(px + i * (tw + 6) + 9, pt - 10, 4, i === 0 ? 'greenSoft' : 'bg');
+        text(t, px + i * (tw + 6) + 4, pt - 22, 6.2, { bold: true, color: 'body' });
+      });
+      pt -= 34;
+    }
+
+    if (spec.stats) {
+      const sw = (pw - 8) / 2;
+      spec.stats.forEach(([label, value], i) => {
+        const sx = px + i * (sw + 8);
+        rect(sx, pt - 2, sw, 28, 'white', 5);
+        strokeRect(sx, pt - 2, sw, 28, 'line', 5);
+        text(label, sx + 7, pt - 11, 6.4, { color: 'body' });
+        text(value, sx + 7, pt - 22, 10.5, { bold: true, color: 'ink' });
+      });
+      pt -= 36;
+    }
+
+    if (spec.fields && !spec.garment) {
+      const rows = spec.fields;
+      rows.forEach(([label, value], i) => {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const fx = px + col * ((pw + 6) / 2);
+        const fy = pt - row * 29;
+        text(label, fx, fy, 6.2, { color: 'body' });
+        rect(fx, fy - 15, (pw - 6) / 2, 13, 'white', 4);
+        strokeRect(fx, fy - 15, (pw - 6) / 2, 13, 'line', 4);
+        text(value, fx + 5, fy - 11, 6.8, { bold: true, color: 'ink' });
+      });
+      pt -= Math.ceil(rows.length / 2) * 29;
+    }
+
+    if (spec.garment) {
+      /* daayein taraf chhota kapra, baayein naap ke fields */
+      const panelW = 70;
+      const panelX = x + w - panelW - 12;
+      const panelTop = top - 38;
+      const panelH = h - 50;
+      rect(panelX, panelTop, panelW, panelH, 'white', 8);
+      strokeRect(panelX, panelTop, panelW, panelH, 'line', 8);
+
+      const cxg = panelX + panelW / 2;
+      const shoulder = panelTop - 26;
+      const torsoBottom = shoulder - 32;
+      const navy = [0.13, 0.19, 0.32];
+      ops('q', color(navy));
+      /* kameez */
+      ops(`${cxg - 12} ${shoulder} m ${cxg + 12} ${shoulder} l ${cxg + 14} ${torsoBottom} l ${cxg - 14} ${torsoBottom} l f`);
+      /* bazu */
+      ops(`${cxg - 12} ${shoulder - 1} m ${cxg - 21} ${shoulder - 17} l ${cxg - 18} ${shoulder - 19} l ${cxg - 10} ${shoulder - 5} l f`);
+      ops(`${cxg + 12} ${shoulder - 1} m ${cxg + 21} ${shoulder - 17} l ${cxg + 18} ${shoulder - 19} l ${cxg + 10} ${shoulder - 5} l f`);
+      /* shalwar */
+      ops(`${cxg - 8} ${torsoBottom} m ${cxg - 9} ${torsoBottom - 18} l ${cxg - 2} ${torsoBottom - 18} l ${cxg + 1} ${torsoBottom} l f`);
+      ops(`${cxg + 8} ${torsoBottom} m ${cxg + 9} ${torsoBottom - 18} l ${cxg + 2} ${torsoBottom - 18} l ${cxg - 1} ${torsoBottom} l f`);
+      ops('Q');
+      /* gala */
+      circle(cxg, shoulder + 1, 3.2, 'white');
+
+      const colW = (panelX - px - 10) / 2;
+      spec.fields.forEach(([label, value], i) => {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const fx = px + col * (colW + 8);
+        const fy = pt - row * 30;
+        text(label, fx, fy, 6.2, { color: 'body' });
+        rect(fx, fy - 15, colW, 13, 'white', 4);
+        strokeRect(fx, fy - 15, colW, 13, 'line', 4);
+        text(value, fx + 5, fy - 11, 6.8, { bold: true, color: 'ink' });
+      });
+      return;
+    }
+
+    if (spec.key) {
+      rect(px, pt - 2, pw, 16, 'white', 4);
+      strokeRect(px, pt - 2, pw, 16, 'line', 4);
+      text(spec.key, px + 6, pt - 12, 6.6, { color: 'body' });
+      pt -= 22;
+      if (spec.note) { text(spec.note, px, pt, 6.6, { color: 'body' }); pt -= 12; }
+    } else if (spec.note) {
+      text(spec.note, px, pt, 6.8, { color: 'body' });
+      pt -= 14;
+    }
+
+    (spec.rows || []).forEach((row) => {
+      const rowH = row.bar ? 24 : 20;
+      rect(px, pt, pw, rowH, 'white', 4);
+      strokeRect(px, pt, pw, rowH, 'line', 4);
+      circle(px + 10, pt - 9.5, 5, 'bg');
+      text(row.t, px + 19, pt - 8.4, 7, { bold: true, color: 'ink' });
+      text(row.s, px + 19, pt - 16, 5.8, { color: 'faint' });
+      if (row.pill) pill(px + pw - (textWidth(row.pill[0], 6.4, true) + 20), pt - 3.5, row.pill[0], row.pill[1], 6.4);
+      if (row.right) text(row.right, px + pw - textWidth(row.right, 7, true) - 7, pt - 12, 7, { bold: true, color: row.tone === 'out' ? 'red' : row.tone === 'in' ? 'green' : 'ink' });
+      if (row.bar) {
+        bar(px + 19, pt - rowH + 4, pw - 46, 2.6, COLORS.line);
+        bar(px + 19, pt - rowH + 4, (pw - 46) * row.bar, 2.6, 'green');
+      }
+      pt -= rowH + 4;
     });
-    [0, 1].forEach((r) => {
-      rect(px, pt - 44 - r * 11, iw, 8, 'white', 4);
-      strokeRect(px, pt - 44 - r * 11, iw, 8, 'line', 4);
-      circle(px + 8, pt - 48 - r * 11, 2.8, 'bg');
-      rect(px + 15, pt - 49.4 - r * 11, iw * 0.34, 2.8, 'line', 1.4);
-    });
+
+    if (spec.total) {
+      const tw = (pw - 8) / 2;
+      spec.total.forEach(([label, value], i) => {
+        const tx = px + i * (tw + 8);
+        rect(tx, pt - 2, tw, 24, 'white', 4);
+        strokeRect(tx, pt - 2, tw, 24, 'line', 4);
+        text(label, tx + 6, pt - 9, 5.6, { bold: true, color: 'faint' });
+        text(value, tx + 6, pt - 19, 8.6, { bold: true, color: i === 1 ? 'red' : 'ink' });
+      });
+      pt -= 30;
+    }
+
+    if (spec.nav) {
+      const navTop = top - h + 22;
+      const navH = 18;
+      rect(px, navTop, pw, navH, 'white', 6);
+      strokeRect(px, navTop, pw, navH, 'line', 6);
+      const nw = pw / spec.nav.length;
+      spec.nav.forEach((n, i) => {
+        const nx = px + i * nw;
+        if (i === 0) rect(nx + 4, navTop - 2.5, nw - 8, navH - 5, 'green', 5.5);
+        text(n, nx + nw / 2 - textWidth(n, 5.4, true) / 2, navTop - navH + 6.4, 5.4,
+          { bold: true, color: i === 0 ? 'white' : 'faint' });
+      });
+      if (spec.fab) {
+        const fw = textWidth(spec.fab, 6.4, true) + 18;
+        const fx = px + pw / 2 - fw / 2;
+        rect(fx, navTop + 14, fw, 13, 'green', 6.5);
+        text(spec.fab, fx + 9, navTop + 18.4, 6.4, { bold: true, color: 'white' });
+      }
+      return;
+    }
+
+    if (spec.button) {
+      const bw = textWidth(spec.button, 7, true) + 18;
+      const byTop = Math.min(pt - 2, top - h + 20);
+      rect(px, byTop, bw, 15, 'green', 5);
+      text(spec.button, px + 9, byTop - 10.4, 7, { bold: true, color: 'white' });
+      if (spec.second) {
+        const sw2 = textWidth(spec.second, 6.6, true) + 16;
+        rect(px + bw + 6, byTop, sw2, 15, 'white', 5);
+        strokeRect(px + bw + 6, byTop, sw2, 15, 'line', 5);
+        text(spec.second, px + bw + 14, byTop - 10.4, 6.6, { bold: true, color: 'body' });
+      }
+    }
   };
 
-  const diagramFor = {
-    intro: 'cards', dashboard: 'screen', order: 'screen', flow: 'flow', naap: 'cards',
-    karigar: 'cards', paisa: 'bars', reports: 'bars', backup: 'cards', sync: 'cards',
-    mobile: 'screen', faq: 'cards',
+  const flowScreen = (section, x, top, w, h) => {
+    rect(x, top, w, h, 'bg', 10);
+    const px = x + 12;
+    text('Kaam ka safar  ·  status', px, top - 18, 7.8, { bold: true, color: 'ink' });
+    let cx0 = px;
+    let pt = top - 38;
+    ['Naya', 'Cutting', 'Silai', 'Fitting', 'Tayyar', 'Diya'].forEach((label, i) => {
+      const tone = ['naya', 'cutting', 'silai', 'fitting', 'tayyar', 'diya'][i];
+      const wPill = textWidth(label, 7, true) + 20;
+      if (cx0 + wPill > x + w - 12) { cx0 = px; pt -= 18; }
+      pill(cx0, pt, label, tone, 7);
+      cx0 += wPill + 6;
+    });
+    text('Status badalne se dashboard, reports aur late ka nishan khud update hote hain.', px, top - h + 18, 6.8, { color: 'body' });
   };
 
-  newPage();
   sections.forEach((s) => {
-    ensure(128);
+    const dh = s.id === 'status' ? 92 : 124;
+    ensure(dh + 120);
     const badgeY = y;
     rect(M, badgeY, 30, 20, 'greenSoft', 6);
     text(s.no, M + 8, badgeY - 14, 9.4, { bold: true, color: 'green' });
@@ -258,10 +493,8 @@ export function buildGuidePdf(sections, meta = {}) {
     wrap(s.intro, 9.8, CONTENT_W).forEach((l, i) => { text(l, M, y - i * 13.5, 9.8, { color: 'body' }); });
     y -= wrap(s.intro, 9.8, CONTENT_W).length * 13.5 + 12;
 
-    const kind = diagramFor[s.visual] || 'cards';
-    const dh = 72;
-    if (y - dh < M + 40) newPage();
-    drawDiagram(kind, M, y, CONTENT_W, dh);
+    if (s.id === 'status') flowScreen(s, M, y, CONTENT_W, dh);
+    else drawScreen(s, M, y, CONTENT_W, dh);
     y -= dh + 20;
 
     (s.points || []).forEach(([label, body]) => {

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ArrowDownToLine, BookOpen, Lightbulb, Sparkles } from 'lucide-react';
 import { Modal } from './ui.jsx';
-import GuideVisual from './GuideVisuals.jsx';
+import GuideScreen from './GuideScreens.jsx';
 import { GUIDE_SECTIONS, GUIDE_TITLE } from './guide.js';
 import { downloadPdf } from './pdf.js';
 import { download } from './export.js';
@@ -59,7 +59,10 @@ export default function Guide({ onClose, notify, shopName }) {
                 <h3>{s.title}</h3>
               </div>
             </header>
-            <GuideVisual kind={s.visual}/>
+            <div className="guide-screen">
+              <GuideScreen kind={s.visual}/>
+              <span className="guide-cap">Asli app screen</span>
+            </div>
             <p className="guide-intro">{s.intro}</p>
             {s.flow && (
               <div className="guide-flow">
@@ -114,7 +117,7 @@ export function GuideCard({ onOpen, notify, shopName }) {
             <button className="btn btn-outline" onClick={() => saveGuidePdf(shopName, notify)}><ArrowDownToLine size={16}/> PDF download</button>
           </div>
         </div>
-        <div className="guide-card-visual"><GuideVisual kind="intro"/></div>
+        <div className="guide-card-visual"><GuideScreen kind="intro"/></div>
       </div>
     </section>
   );
