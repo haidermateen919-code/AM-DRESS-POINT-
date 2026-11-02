@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Darzi Dukaan static app + optional encrypted snapshot sync (standard library only)."""
+"""AM Dress Point static app + optional encrypted snapshot sync (standard library only)."""
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 from pathlib import Path
@@ -118,7 +118,7 @@ def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--host', default='127.0.0.1'); parser.add_argument('--port',type=int,default=4173); args=parser.parse_args()
     if not (SITE / 'index.html').exists(): raise SystemExit('site/ missing. Run npm install && npm run build first.')
     with db(): pass
-    print(f'Darzi Dukaan listening on http://{args.host}:{args.port}', flush=True)
+    print(f'AM Dress Point listening on http://{args.host}:{args.port}', flush=True)
     ThreadingHTTPServer((args.host,args.port),Handler).serve_forever()
 
 if __name__ == '__main__': main()

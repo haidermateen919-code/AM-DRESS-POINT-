@@ -7,7 +7,7 @@ function versionServiceWorker() {
     const dir=resolve('site');
     const fingerprint=createHash('sha256').update(readFileSync(resolve(dir,'assets/app.js'))).update(readFileSync(resolve(dir,'assets/style.css'))).digest('hex').slice(0,12);
     const file=resolve(dir,'sw.js');
-    writeFileSync(file,readFileSync(file,'utf8').replace('darzi-dukaan-shell-v1',`darzi-dukaan-shell-${fingerprint}`));
+    writeFileSync(file,readFileSync(file,'utf8').replace('am-dress-point-shell-v1',`darzi-dukaan-shell-${fingerprint}`));
   }};
 }
 export default defineConfig({

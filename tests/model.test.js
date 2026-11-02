@@ -32,7 +32,7 @@ test('CSV neutralizes formulas and structured reports contain totals',()=>{
   assert.match(csv([['=1+1','-cmd','ok']]),/"'=1\+1","'-cmd","ok"/);
   const d=demoData();assert.match(reportCsv(d,'orders'),/total_pkr/);assert.match(reportCsv(d,'payments'),/amount_pkr/);assert.match(reportCsv(d,'items'),/wage_per_piece/);
 });
-test('empty and next order numbering are predictable',()=>{const d=blankData();assert.equal(nextOrderNumber(d),'DD-1001');d.orders=[{number:'DD-1008'}];assert.equal(nextOrderNumber(d),'DD-1009');assert.equal(hasMeasure({values:{chest:'22½'},extra:[]}),true);});
+test('empty and next order numbering are predictable',()=>{const d=blankData();assert.equal(nextOrderNumber(d),'AD-1001');d.orders=[{number:'AD-1008'}];assert.equal(nextOrderNumber(d),'AD-1009');assert.equal(hasMeasure({values:{chest:'22½'},extra:[]}),true);});
 
 test('each item can have its own delivery date and dashboard counts only matching pieces',()=>{
   const d=blankData(), today=dateKey();
@@ -41,7 +41,7 @@ test('each item can have its own delivery date and dashboard counts only matchin
 });
 
 test('a deleted highest order number is not reused once the serial is recorded',()=>{
-  const d=blankData();d.nextOrderSerial=1006;d.orders=[{number:'DD-1004'}];assert.equal(nextOrderNumber(d),'DD-1006');
+  const d=blankData();d.nextOrderSerial=1006;d.orders=[{number:'AD-1004'}];assert.equal(nextOrderNumber(d),'AD-1006');
 });
 
 test('corrupt nested records are rejected before an import can replace local data',()=>{
