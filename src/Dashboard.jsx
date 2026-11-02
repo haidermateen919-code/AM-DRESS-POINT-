@@ -21,6 +21,16 @@ export default function Dashboard({onOrder,onView,onNew,onCustomer}) {
   const days=Array.from({length:7},(_,i)=>shiftDay(today,i-6)); const values=days.map(d=>receivedByDate(data,d)); const max=Math.max(...values,1); const weekly=values.reduce((s,n)=>s+n,0);
   return <div className="page dashboard-page">
     <PageHead eyebrow="DUKAAN OVERVIEW" title={<>Aaj ka kaam, <em>aasan.</em></>} subtitle="Aapki dukaan ka saara haal, ek nazar mein." actions={<div className="today-chip"><CalendarClock size={15}/> {fmtDate(today,{weekday:'short',day:'numeric',month:'long'})}</div>}/>
+    <div className="hero-banner">
+      <img src="/img/hero-dashboard.jpg" alt="Dukaan mein rakha kapra, dhaaga aur naap ka saman" width="1440" height="576" fetchPriority="high"/>
+      <div className="hero-scrim"/>
+      <div className="hero-copy">
+        <span className="hero-eyebrow">AM DRESS POINT · CLOTH HOUSE</span>
+        <strong>Har naap, <em>perfect fitting.</em></strong>
+        <small>{m.open.length} order khulay · {m.dueTodayPieces} joray aaj due</small>
+      </div>
+      <span className="hero-tag">Aaj ka kaam</span>
+    </div>
     <div className="quick-row">
       <button className="quick-tile" onClick={onNew}><span className="q-icon q-order"><Plus size={18}/></span>Naya order</button>
       <button className="quick-tile" onClick={onCustomer}><span className="q-icon q-customer"><UserPlus size={18}/></span>Customer</button>

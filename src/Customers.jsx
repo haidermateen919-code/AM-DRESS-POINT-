@@ -3,6 +3,7 @@ import { ArrowUpRight, History, MapPin, Plus, Ruler, Users, UserRound, Trash2, P
 import { useShop } from './store.jsx';
 import { addMeasurement, EMPTY_MEASURE, fmtDate, GARMENTS, hasMeasure, MEASURES, uid } from './model.js';
 import { Empty, ErrorText, Field, Initials, Modal, ModalFooter, PageHead, SearchBox } from './ui.jsx';
+import NaapPreview, { fabricHex, fabricLabel } from './NaapPreview.jsx';
 
 export function CustomerForm({customer,onClose,onSaved}) {
   const {mutate}=useShop(); const [name,setName]=useState(customer?.name||''),[phone,setPhone]=useState(customer?.phone||''),[village,setVillage]=useState(customer?.village||''),[notes,setNotes]=useState(customer?.notes||''),[error,setError]=useState(''),[saving,setSaving]=useState(false);
@@ -29,7 +30,8 @@ export function MeasurementEditor({initial,typeFixed=false,personName,onClose,on
   async function submit(e){e.preventDefault();if(!hasMeasure(form))return setError('Kam az kam aik naap likhein.');setSaving(true);try{await onSave({...form, type:form.type},saveProfile);onClose();}catch(_){setError('Naap save nahi ho saka. Browser storage check karein.');}finally{setSaving(false);}}
   return <Modal title="Naap likhein" subtitle={`${personName||'Customer'} · Har darzi ke tareeqay ke mutabiq`} onClose={onClose} wide>
     <form onSubmit={submit}>
-      <div className="measurement-intro"><Ruler size={19}/><span>Sirf wohi fields bharain jo aap istemal karte hain. Fractions, jaise <strong>22½</strong>, bhi likh sakte hain.</span></div>
+      <NaapPreview type={form.type} values={form.values} width={form.width} unit={form.unit} color={form.color||'ivory'} onColor={c=>patch('color',c)}/>
+      <div className="measurement-intro"><img className="measure-intro-thumb" src="/img/measure-thumb.jpg" alt="" width="320" height="320" loading="lazy"/><span>Sirf wohi fields bharain jo aap istemal karte hain. Fractions, jaise <strong>22½</strong>, bhi likh sakte hain.</span></div>
       <div className="form-grid three-col">
         <Field label="Kapray ki qisam"><select value={form.type} disabled={typeFixed} onChange={e=>setForm({...EMPTY_MEASURE(),type:e.target.value})}>{GARMENTS.map(g=><option key={g}>{g}</option>)}</select></Field>
         <Field label="Naap kis ka hai?"><select value={form.basis} onChange={e=>patch('basis',e.target.value)}><option value="tayyar">Tayyar kapray ka</option><option value="jism">Jism ka</option></select></Field>
@@ -49,7 +51,7 @@ export function MeasurementEditor({initial,typeFixed=false,personName,onClose,on
 export function MeasurementSummary({measure}) {
   const labels=Object.fromEntries((MEASURES[measure.type]||MEASURES.Dusra).flatMap(x=>x[1]));
   const entries=[...Object.entries(measure.values||{}).filter(([,v])=>String(v||'').trim()).map(([k,v])=>[labels[k]||k,v]),...(measure.extra||[]).filter(x=>x.value).map(x=>[x.label||'Custom',x.value])];
-  return <div className="measure-summary"><div className="measure-chips">{entries.map(([k,v],i)=><span key={i}><small>{k}</small><strong>{v}</strong></span>)}</div>{measure.note&&<p><strong>Fitting note:</strong> {measure.note}</p>}<div className="measure-meta">{measure.basis==='jism'?'Jism':'Tayyar kapray'} ka naap · {measure.width==='aadha'?'Aadha':measure.width==='poora'?'Poora':'Mixed'} · {measure.unit||'inch'}</div></div>;
+  return <div className="measure-summary"><div className="measure-chips">{entries.map(([k,v],i)=><span key={i}><small>{k}</small><strong>{v}</strong></span>)}</div>{measure.note&&<p><strong>Fitting note:</strong> {measure.note}</p>}<div className="measure-meta">{measure.basis==='jism'?'Jism':'Tayyar kapray'} ka naap · {measure.width==='aadha'?'Aadha':measure.width==='poora'?'Poora':'Mixed'} · {measure.unit||'inch'}{measure.color&&<span className="measure-color"><i style={{background:fabricHex(measure.color)}}/>{fabricLabel(measure.color)}</span>}</div></div>;
 }
 
 export function CustomerDetail({id,onClose,onEdit,onOrder}) {
@@ -66,7 +68,11 @@ export function CustomerDetail({id,onClose,onEdit,onOrder}) {
     <div className="detail-section-title"><div><span className="mini-eyebrow">EK GHAR, ALAG NAAP</span><h3>Kapray kis ke liye?</h3></div><button className="text-action" onClick={()=>setNewPerson(true)}><Plus size={15}/> Ghar ka fard</button></div>
     <div className="person-tabs">{customer.people.map(p=><button key={p.id} onClick={()=>setPersonId(p.id)} className={p.id===person?.id?'active':''}><UserRound size={15}/>{p.name}<small>{p.relation}</small></button>)}</div>
     {person&&<div className="profile-panel"><div className="profile-head"><div><h3>{person.name} ka naap</h3><p>Purane naap mehfooz rehte hain; naya naap alag save hota hai.</p></div><button className="btn btn-primary btn-small" onClick={()=>setMeasure({type:'Shalwar Kameez'})}><Plus size={15}/> Naap add karein</button></div>
-      {latestTypes.length?latestTypes.map(m=><div className="measure-card" key={m.id}><div className="measure-card-top"><div><strong>{m.type}</strong><small>Update: {fmtDate(m.savedAt)}</small></div><button className="text-action" onClick={()=>setMeasure(m)}><Pencil size={14}/> Naya version</button></div><MeasurementSummary measure={m}/></div>):<Empty icon={Ruler} title="Abhi naap save nahi hai" text="Pehla naap add karein; order mein use ho jayega."/>}
+      {latestTypes.length?latestTypes.map(m=><div className="measure-card" key={m.id}><div className="measure-card-top"><div><strong>{m.type}</strong><small>Update: {fmtDate(m.savedAt)}</small></div><button className="text-action" onClick={()=>setMeasure(m)}><Pencil size={14}/> Naya version</button></div><MeasurementSummary measure={m}/></div>):
+        <div className="naap-empty-card">
+          <img src="/img/measure-banner.jpg" alt="Naap lene ka tareeqa" loading="lazy" width="1200" height="414"/>
+          <div className="naap-empty-copy"><strong>Abhi naap save nahi hai</strong><p>Pehla naap add karein — order banate waqt wohi khud bhar jayega.</p><button className="btn btn-primary btn-small" onClick={()=>setMeasure({type:'Shalwar Kameez'})}><Ruler size={15}/> Naap add karein</button></div>
+        </div>}
       {measurements.length>latestTypes.length&&<details className="history-details"><summary><History size={15}/> Purane naap ({measurements.length})</summary>{measurements.map(m=><div className="history-row" key={m.id}><span>{m.type} · {fmtDate(m.savedAt)}</span><button className="text-action" onClick={()=>setMeasure(m)}>Dekhain / copy</button></div>)}</details>}
     </div>}
   </Modal>

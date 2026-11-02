@@ -43,7 +43,7 @@ Reports mein **Orders, Items, Payments aur Expenses CSV** download karke Excel y
 ```
 index.html            # Vite entry (src/main.jsx load karta hai)
 src/                  # React app ka source (App, pages, model, store, sync, styles.css)
-public/               # sw.js, manifest.webmanifest, _headers, icons/, fonts/, logo-*.png
+public/               # sw.js, manifest.webmanifest, _headers, icons/, fonts/, img/, logo-*.png
 tests/                # npm test (model.test.js) + python unittest (test_sync_server.py)
 server.py             # static site + optional encrypted sync API (sirf standard library)
 netlify.toml          # Netlify build settings
@@ -55,7 +55,11 @@ site/                 # `npm run build` ka output (git mein nahi, generate hota 
 - **App icon** (`public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`): navy app icon wala logo — home screen / install par yeh nazar aata hai.
 - **Header logo** (`public/logo-mark.png`): white background wala AM monogram — sidebar aur mobile header mein.
 - **Loading screen logo** (`public/logo-full.png`): poora lockup (tagline ke sath).
-- Rung: safaid surface + navy text + logo ka red `#bc1520`. Font: **Plus Jakarta Sans** (variable, `public/fonts/` mein self-hosted, koi Google Fonts request nahi).
+- Rung: safaid surface + navy text + **green primary actions** (`#0f9d6e`); logo ka red sirf halka accent (`#c85a60`) —
+  bhaari surkh buttons ab kahin nahi, taake nazar par zor na pare.
+- Tasveerein (dashboard hero, naap banner) `public/img/` mein bundled hain — offline bhi chalti hain.
+- Naap editor mein **live preview**: lambai/chaati/daman badlein, figure foran badalta hai.
+- Font: **Plus Jakarta Sans** (variable, `public/fonts/` mein self-hosted, koi Google Fonts request nahi).
 
 
 ## ZIP se apne computer par chalana

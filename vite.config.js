@@ -13,6 +13,9 @@ const PUBLIC_SHELL = [
   '/icons/apple-touch-icon.png',
   '/logo-mark.png',
   '/fonts/plus-jakarta-sans-latin-wght-normal.woff2',
+  '/img/hero-dashboard.jpg',
+  '/img/measure-banner.jpg',
+  '/img/measure-thumb.jpg',
 ];
 
 function buildServiceWorker() {
