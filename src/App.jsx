@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import { BarChart3, BriefcaseBusiness, CheckCircle2, ChevronDown, ChevronRight, CircleHelp, ClipboardList, Cloud, CloudOff, Home, LayoutDashboard, Menu, Plus, Scissors, Search, Settings2, ShieldCheck, Users, Wallet, X } from 'lucide-react';
+import { BarChart3, BriefcaseBusiness, CheckCircle2, ChevronDown, ChevronRight, CircleHelp, ClipboardList, Cloud, CloudOff, Home, LayoutDashboard, LayoutGrid, Plus, Scissors, Search, Settings2, ShieldCheck, Users, Wallet, X } from 'lucide-react';
 import { useShop } from './store.jsx';
 import { dateKey, fmtDate, itemDueDate, money, orderBalance, orderPaid, orderTotal } from './model.js';
 import { CustomerDetail, CustomerForm } from './Customers.jsx';
@@ -46,7 +46,7 @@ export default function App(){
         {storageError&&<div className="storage-banner">{storageError}</div>}
         {syncStatus==='conflict'&&<div className="storage-banner">Sync conflict: dono devices par alag changes hain. <button onClick={()=>go('settings')}>Backup aur settings dekhain</button></div>}
         {data.isDemo&&<div className="demo-banner"><div className="demo-icon">✳</div><div><strong>Yeh sample dukaan hai</strong><span>Demo data se app dekhain; apna kaam shuru karne se pehle sample hatayein.</span></div><button onClick={fresh}>Apni dukaan shuru karein <ChevronRight size={15}/></button></div>}
-        {view==='dashboard'&&<Dashboard onOrder={setOrderDetail} onView={go} onNew={()=>newOrder()}/>}
+        {view==='dashboard'&&<Dashboard onOrder={setOrderDetail} onView={go} onNew={()=>newOrder()} onCustomer={()=>setCustomerForm({})}/>}
         {view==='orders'&&<Orders onNew={()=>newOrder()} onOrder={setOrderDetail} initialSearch={orderSearch}/>}
         {view==='customers'&&<Customers onNew={()=>setCustomerForm({})} onCustomer={setCustomerDetail}/>}
         {view==='finance'&&<Finance onOrder={setOrderDetail}/>}
@@ -55,8 +55,18 @@ export default function App(){
         {view==='settings'&&<Settings notify={notify}/>}
       </main><footer className="app-footer"><span>© {new Date().getFullYear()} AM Dress Point <i/> Dress Point · Cloth House</span><span>Naap se delivery tak <span className="footer-spark">✳</span></span></footer>
     </div>
-    <nav className="mobile-nav" aria-label="Mobile menu">{mobile.map(({id,label,icon:Icon})=><button key={id} onClick={()=>go(id)} className={view===id?'active':''}><Icon size={19}/><span>{id==='dashboard'?'Home':id==='customers'?'Naap':id==='finance'?'Hisaab':label}</span></button>)}<button onClick={()=>setMore(!more)} className={['workers','reports','settings'].includes(view)?'active':''}><Menu size={19}/><span>More</span></button></nav>
-    {more&&<div className="mobile-more"><div className="mobile-more-head"><strong>Aur options</strong><button className="icon-btn" onClick={()=>setMore(false)} aria-label="Menu band karein"><X size={17}/></button></div>{NAV.slice(4).map(({id,label,icon:Icon})=><button key={id} onClick={()=>go(id)}><Icon size={17}/>{label}<ChevronRight size={16}/></button>)}</div>}
+    <button className="fab" onClick={()=>newOrder()} aria-label="Naya order banayein"><Plus size={18}/> Naya order</button>
+    <nav className="mobile-nav" aria-label="Mobile menu">{mobile.map(({id,label,icon:Icon})=><button key={id} onClick={()=>go(id)} className={view===id?'active':''} aria-current={view===id?'page':undefined}><Icon size={19}/><span>{id==='dashboard'?'Home':id==='customers'?'Naap':id==='finance'?'Hisaab':label}</span></button>)}<button onClick={()=>setMore(!more)} className={['workers','reports','settings'].includes(view)?'active':''} aria-expanded={more}><LayoutGrid size={19}/><span>More</span></button></nav>
+    {more&&<><div className="sheet-backdrop" onClick={()=>setMore(false)}/>
+      <div className="mobile-more" role="dialog" aria-label="Aur options">
+        <div className="mobile-more-head"><span className="sheet-grip"/><strong>Aur options</strong><button className="icon-btn" onClick={()=>setMore(false)} aria-label="Menu band karein"><X size={17}/></button></div>
+        {NAV.slice(4).map(({id,label,icon:Icon})=><button key={id} onClick={()=>go(id)} className={'more-'+id+(view===id?' active':'')}>
+            <span className="more-icon"><Icon size={19}/></span>
+            <span className="more-text"><strong>{label}</strong><small>{id==='workers'?'Mazdoori, kaam aur karigar ka hisaab':id==='reports'?'Charts, trend aur CSV export':'Dukaan, naap backup, sync aur install'}</small></span>
+            <ChevronRight size={17}/>
+          </button>)}
+      </div>
+    </>}
     {toast&&<div className="toast" role="status"><CheckCircle2 size={17}/>{toast}</div>}
     {customerDetail&&<CustomerDetail id={customerDetail} onClose={()=>setCustomerDetail('')} onEdit={c=>setCustomerForm({customer:c})} onOrder={id=>{setCustomerDetail('');newOrder(id);}}/>}
     {customerForm&&<CustomerForm customer={customerForm.customer} onClose={()=>setCustomerForm(null)} onSaved={()=>notify('Customer save ho gaya.')}/>}
