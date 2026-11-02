@@ -8,11 +8,19 @@ AM Dress Point (Cloth House) — mardon ki silai ki dukaan ke liye mobile-friend
 2. Asli kaam se pehle **Apni dukaan shuru karein** par click karein. Is se sample aur sample par ki gayi changes hat jayengi.
 3. Settings mein dukaan ka naam, phone, pata aur daily capacity likh kar save karein.
 4. **Customers & Naap** mein customer add karein. Phone number optional hai; ek number se alag profiles ban sakti hain. Customer ke andar ghar ke aur afrad bhi add kar sakte hain.
-5. Kisi fard ka **Naap add karein**. Tayyar kapray / jism aur aadha / poora ghera khud choose karein. Text mein `22½` jaise naap, note aur apne custom fields bhi likh sakte hain. Har naya version purane se alag save hota hai.
+5. Kisi fard ka **Naap add karein**. Oopar **live 3D preview** hai: lambai, chaati, bazu, daman ya rang badlein, kapra foran waisa hi nazar aata hai. Tayyar kapray / jism aur aadha / poora ghera khud choose karein. Text mein `22½` jaise naap, note aur apne custom fields bhi likh sakte hain. Har naya version purane se alag save hota hai.
 6. **Naya order** mein customer, har fard ka item, quantity, rate, kapray ki pehchan, design, due date aur advance likhein. Alag delivery date ya alag status ke liye item alag add karein. Ek item par quantity 2 ho to us group ka status ek hi hoga.
 7. Order khol kar har item ki status, payment, receipt aur WhatsApp message check karein. WhatsApp message khud-bakhud send nahi hota; user ko confirm/send karna hota hai. Receipt se browser mein Print / Save as PDF kar sakte hain.
 8. **Karigar** optional hai. Order item mein karigar aur per-piece mazdoori likhein. Completed mazdoori sirf Tayyar ya Diya gaya items se ginati hai; di hui mazdoori kharchon mein bhi record hoti hai.
 9. **Hisaab** aur **Reports** mein wasooli, baqaya, recorded kharchay aur charts dekhein. Net cash = wasooli minus recorded kharchay; yeh munafa nahi hai.
+
+## Guide (app ke andar)
+
+**Settings → Guide kholein** se mukammal guide khulti hai: 12 hisse, har feature ka aasan roman-urdu tareeqa, chhoti SVG tasveeron ke sath (dashboard, order, status flow, naap, hisaab, reports, backup, sync, mobile, FAQ).
+
+- **PDF download** — poori guide (8 safhe, A4) app hi mein banti hai; koi internet ya library nahi chahiye. File ka naam: `am-dress-point-guide-YYYY-MM-DD.pdf`.
+- PDF engine `src/pdf.js` (standard PDF commands, Helvetica) aur content `src/guide.js` mein hai — app aur PDF dono ek hi content se bante hain, is liye dono kabhi alag nahi hote.
+- Naya feature add karein to `src/guide.js` mein us ka hissa likh dein; guide aur PDF khud update ho jayenge.
 
 ## Mobile aur offline
 
@@ -58,7 +66,7 @@ site/                 # `npm run build` ka output (git mein nahi, generate hota 
 - Rung: safaid surface + navy text + **green primary actions** (`#0f9d6e`); logo ka red sirf halka accent (`#c85a60`) —
   bhaari surkh buttons ab kahin nahi, taake nazar par zor na pare.
 - Tasveerein (dashboard hero, naap banner) `public/img/` mein bundled hain — offline bhi chalti hain.
-- Naap editor mein **live preview**: lambai/chaati/daman badlein, figure foran badalta hai.
+- Naap editor mein **live 3D preview**: kapra halka sa tilted, saya (shadow), kapre ki bunai aur folds ke sath; lambai/chaati/bazu/daman/rang badlein aur figure smooth animation ke sath badalta hai.
 - Font: **Plus Jakarta Sans** (variable, `public/fonts/` mein self-hosted, koi Google Fonts request nahi).
 
 
