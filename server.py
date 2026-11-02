@@ -43,8 +43,12 @@ class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Referrer-Policy', 'no-referrer')
-        if self.path.startswith('/api/'): self.send_header('Cache-Control', 'no-store')
-        if self.path.split('?')[0] in ('/', '/index.html', '/sw.js'): self.send_header('Cache-Control', 'no-cache')
+        if self.path.startswith('/api/'):
+            self.send_header('Cache-Control', 'no-store')
+        else:
+            # Always revalidate: a new build must never hide behind a stale cache.
+            # Unchanged files still answer with a fast 304 Not Modified.
+            self.send_header('Cache-Control', 'no-cache, must-revalidate')
         super().end_headers()
 
     def reply(self, status, body):
