@@ -1,0 +1,3 @@
+# Single-page app: any unknown path still opens the app shell.
+# Existing files (assets, sw.js, icons) are always served as-is.
+/*    /index.html   200
