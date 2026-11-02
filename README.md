@@ -38,6 +38,18 @@ Mardon ki silai ki dukaan ke liye mobile-friendly, installable web app. Yeh **wo
 
 Reports mein **Orders, Items, Payments aur Expenses CSV** download karke Excel ya Microsoft Power BI mein manually import kar sakte hain. Is version mein live Microsoft Power BI integration, Microsoft login ya automatic report refresh nahi hai. Data ki mukammalta aap ki entries par depend karti hai.
 
+## Project structure
+
+```
+index.html            # Vite entry (src/main.jsx load karta hai)
+src/                  # React app ka source (App, pages, model, store, sync, styles.css)
+public/               # sw.js, manifest.webmanifest, _headers, icons/, fonts/
+tests/                # npm test (model.test.js) + python unittest (test_sync_server.py)
+server.py             # static site + optional encrypted sync API (sirf standard library)
+netlify.toml          # Netlify build settings
+site/                 # `npm run build` ka output (git mein nahi, generate hota hai)
+```
+
 ## ZIP se apne computer par chalana
 
 ZIP mein bana hua `site/` aur source code dono shamil hain. Python 3.9+ chahiye; basic use ke liye Node ya internet ki zaroorat nahi.
@@ -59,6 +71,30 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 `site/` dobara build hota hai. Vite dev server ke liye pehle `python3 server.py --port 4174`, phir doosray terminal mein `npm run dev`; `/api` local Python server ko proxy hoti hai.
+
+## Netlify par hosting
+
+### A) GitHub se connect (recommended — har push par khud deploy)
+
+1. Netlify → **Add new site → Import an existing project → Deploy with GitHub**.
+2. Repo `haidermateen919-code/AM-DRESS-POINT-` aur branch `main` chunain.
+3. Build command `npm run build`, publish directory `site` (yeh `netlify.toml` se khud aa jata hai, kuch likhna nahi parta).
+4. **Deploy site**. Har naye commit par Netlify khud build kar ke live kar deta hai.
+
+### B) ZIP / folder manually upload (jab build khud karna ho)
+
+```bash
+npm install
+npm run build
+cd site && zip -r ../darzi-dukaan-netlify.zip . -x '.*'
+```
+
+`site/` ke andar mojood files (index.html, assets/, icons/, fonts/, sw.js, manifest.webmanifest, _headers) `darzi-dukaan-netlify.zip` ki jarr mein honi chahiye. Netlify → **Deploys → Drag and drop** mein woh zip daal dain.
+
+### Netlify par sync ka kya?
+
+Netlify static hosting hai; `server.py` wahan nahi chalta, is liye **encrypted device sync** Netlify par kaam nahi karegi — app local storage, backup/restore aur CSV export ke sath pura chalta rahega. Sync ke liye alag server chahiye; chahein to sync ko Netlify Functions par muntaqil kiya ja sakta hai.
+
 
 ## Zaroori haddain
 
